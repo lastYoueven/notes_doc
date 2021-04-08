@@ -1,0 +1,1 @@
+notes of the daliy

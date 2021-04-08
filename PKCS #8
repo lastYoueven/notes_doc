@@ -1,0 +1,746 @@
+                                                            
+互联网工程任务组（IETF）S. Turner
+请求评论：5958 IECA
+已淘汰：                                              2010年8月5208日
+类别：标准跟踪
+ISSN：2070-1721
+
+
+                        非对称密钥包
+
+抽象的
+
+   本文档定义了私钥信息的语法和
+   内容类型。私钥信息包括私钥
+   用于指定的公钥算法和一组属性。这RFC 5652中
+   定义的加密消息语法（CMS）可以是
+   用于数字签名，摘要，认证或加密
+   非对称密钥格式的内容类型。本文档淘汰了RFC 
+   5208。
+
+该备忘录的状态
+
+   这是一个Internet标准跟踪文档。
+
+   本文档是Internet工程任务组的产品
+   （IETF）。它代表了IETF社区的共识。它有
+   受到公众审查，并已被批准出版
+   互联网工程指导小组（IESG）。进一步
+   有关Internet标准的信息可在以下网址的第2部分中找到：
+   RFC 5741。
+
+   有关本文档当前状态的信息，任何
+   勘误表以及如何提供有关勘误表的信息，请访问
+   http://www.rfc-editor.org/info/rfc5958。
+
+版权声明
+
+   版权所有（c）2010 IETF Trust和被认定为
+   文档作者。版权所有。
+
+   本文档受BCP 78和IETF信托法律的约束
+   有关IETF文件的规定
+   （http://trustee.ietf.org/license-info）自生效之日起生效
+   本文档的发布。请查看这些文件
+   小心，因为它们描述了您在尊重方面的权利和限制
+   这份文件。从本文档中提取的代码组件必须
+   包括简化的BSD许可文本，如第4.e节中所述
+   信托法律条款，并且不提供任何担保，因为
+   在简化的BSD许可证中进行了说明。
+
+
+
+特纳标准跑道[第1页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   本文件可能包含来自IETF文件或IETF的材料
+   11月之前发布或公开发布的贡献
+   ，2008年10月10日。在某些情况下控制版权的人
+   资料可能未授予IETF信托的许可权
+   在IETF标准流程之外对此类材料进行修改。
+   没有获得控制人的充分许可
+   此类材料的版权，不得修改本文档
+   在IETF标准流程之外，其衍生作品可能
+   除了格式以外，不能在IETF标准流程之外创建
+   以RFC形式发布或将其翻译为其他语言
+   比英语。
+
+1。介绍
+
+   本文档定义了私钥信息的语法和
+   加密消息语法（CMS）[ RFC5652 ]的内容类型。
+   私钥信息包括指定的私钥
+   公钥算法和一组属性。CMS可以用来
+   对不对称密钥进行数字签名，摘要，认证或加密
+   格式化内容类型。本文档淘汰了PKCS＃8 v1.2 [ RFC5208 ]。
+
+1.1。需求术语
+
+   关键字“必须”，“必须”，“必须”，“应”，“应禁止”，
+   “ SHOULD”，“ SHOULD NOT”，“推荐”，“ MAY”和“ OPTIONAL”在此
+   文档将按照[ RFC2119 ]中的说明进行解释。
+
+1.2。ASN.1语法表示法
+
+   密钥包是使用ASN.1 [ X.680 ]，[ X.681 ]，[ X.682 ]和
+   [ X.683 ]。
+
+1.3。RFC 5208更新摘要
+
+   以下总结了对[ RFC5208 ]的更新：
+
+   -将名称“ PrivateKeyInfo”更改为“ OneAsymmetricKey”。这
+     反映了publicKey字段的添加，以允许
+     非对称密钥需要单独传送。并非所有算法
+     将使用两个字段；但是，为添加了publicKey字段
+     完整性。
+
+   -定义的非对称密钥包CMS内容类型。
+
+   -从属性中删除了多余的IMPLICIT。
+
+   -将公钥添加到OneAsymmetricKey并更新了版本号。
+
+
+
+
+特纳标准跑道[第2页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   -增加了可能支持PKCS＃9属性。
+
+   -增加了与其他私钥格式的兼容性的讨论。
+
+   -增加了对编码规则集的要求。
+
+   -将导入从PKCS＃5更改为[ RFC5912 ]和[ RFC5911 ]。
+
+   -用[ RFC5912 ]中的算法替换了算法标识符。
+
+   -注册application / pkcs8媒体类型和.p8文件扩展名。
+
+2。非对称密钥包CMS内容类型
+
+   非对称密钥包CMS内容类型用于传输一种
+   或更多从一方到另一方的明文非对称密钥。一个
+   非对称密钥包可以封装在一个或多个CMS中
+   保护内容类型（请参阅第4节）。较早的版本
+   规范[ RFC5208 ]没有指定特定的编码规则
+   设置，但是生成器应该使用DER [ X.690 ]，并且接收器必须支持
+   BER [ X.690 ]，其中还包括DER [ X.690 ]。
+
+   非对称密钥包内容类型具有以下语法：
+
+     ct-asymmetric-key-package内容类型:: =
+       {由id-ct-KP-aKeyPackage标识的AsymmetricKeyPackage}
+
+     id-ct-KP-aKeyPackage对象标识符:: =
+       {joint-iso-itu-t（2）国家（16）美国（840）组织（1）
+         gov（101）dod（2）infosec（1）格式（2）
+         密钥包内容类型（78）5
+       }
+
+     AsymmetricKeyPackage :: = OneAsymmetricKey的序列大小（1..MAX）
+
+     OneAsymmetricKey :: = SEQUENCE {
+       版本Version，
+       privateKeyAlgorithm PrivateKeyAlgorithmIdentifier，
+       privateKey私钥，
+       属性[0]属性可选，
+       ...，
+       [[2：publicKey [1] PublicKey OPTIONAL]]，
+       ...
+     }
+
+
+
+
+
+
+
+特纳标准跑道[第3页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+     PrivateKeyInfo :: = OneAsymmetricKey
+
+     -[ P12 ]使用PrivateKeyInfo 。如果有任何项目标记为版本
+     -使用2，版本必须为v2，否则版本应为
+     -v1。在v1中，PrivateKeyInfo与[ RFC5208 ]中的相同。
+
+     版本:: = INTEGER {v1（0），v2（1）}（v1，...，v2）
+
+     PrivateKeyAlgorithmIdentifier :: = AlgorithmIdentifier
+                                        {公钥，
+                                          {PrivateKeyAlgorithms}}
+
+     私钥:: = OCTET STRING
+                        -内容因按键类型而异。这
+                        -算法标识符决定了格式
+                        -  钥匙。
+
+     公钥:: = BIT STRING
+                        -内容因按键类型而异。这
+                        -算法标识符决定了格式
+                        -  钥匙。
+
+     属性:: = SET OF属性{{OneAsymmetricKeyAttributes}}
+
+   AsymmetricKeyPackage包含一个或多个OneAsymmetricKey
+   元素。
+
+   OneAsymmetricKey的语法包含一个版本号，一个
+   专用算法使用的非对称算法的指示
+   密钥，私钥，可选的密钥材料属性（例如，
+   来自[ X.520 ]的userCertificate ）和可选的公共密钥。在
+   通常，将显示公钥或证书。
+   在极少数情况下，公钥和证书都是
+   出现，因为它包括公共密钥的两个副本。
+   OneAsymmetricKey重命名在中定义的PrivateKeyInfo语法
+   [ RFC5208 ]。新名称更好地反映了既携带又携带
+   私钥和公钥组件。向后兼容
+   原始PrivateKeyInfo通过版本号保留。田野
+   在OneAsymmetricKey中的用法如下：
+
+   -版本标识OneAsymmetricKey的版本。如果是publicKey
+     存在，则将版本设置为v2，否则将版本设置为v1。
+
+   -privateKeyAlgorithm标识私钥算法，并且
+     可选地包含与非对称密钥关联的参数
+     一对。该算法由对象标识符（OID）标识
+     参数的格式取决于OID，但是
+     PrivateKeyAlgorithms信息对象集限制了
+
+
+
+特纳标准跑道[第4页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+     允许的OID。值放在
+     privateKeyAlgorithmIdentifier是发起者将要使用的值
+     申请以指示将与私有算法一起使用的算法
+     钥匙。
+
+   -privateKey是一个OCTET STRING，其中包含
+     私钥。内容的解释在
+     私钥算法的注册。例如，DSA密钥
+     是一个INTEGER，一个RSA密钥表示为RSAPrivateKey，如下所示：
+     在[ RFC3447 ]中定义，以及一个椭圆曲线密码（ECC）密钥
+     表示为[ RFC5915 ]中定义的ECPrivateKey 。
+
+   -属性是可选的。它包含对应于
+     公钥（例如证书）。属性字段使用
+     类别ATTRIBUTE，受
+     OneAsymmetricKeyAttributes信息对象集。
+     OneAsymmetricKeyAttributes是本文档中的一个开放式集。
+     其他文档可以约束这些值。来自的属性
+     [ RFC2985 ]可能受支持。
+
+   -publicKey是可选的。如果存在，则包含公钥
+     编码在BIT STRING中。BIT STRING中的结构，如果
+     任何，取决于privateKeyAlgorithm。例如，DSA密钥是
+     一个整数。请注意，RSA公钥包含在
+     根据[ RFC3447 ]的RSAPrivateKey（即存在n和e），和
+     ECC公钥包含在ECPrivateKey中（即，
+     公钥字段），根据[ RFC5915 ]。
+
+3。加密的私钥信息
+
+   本部分提供了加密的私钥信息的语法，
+   [ P12 ]使用的。
+
+   加密的私钥信息应具有ASN.1类型
+   EncryptedPrivateKeyInfo：
+
+     EncryptedPrivateKeyInfo :: = SEQUENCE {
+       encryptionAlgorithm EncryptionAlgorithmIdentifier，
+       加密数据加密数据}
+
+     EncryptionAlgorithmIdentifier :: = AlgorithmIdentifier
+                                        {内容加密，
+                                          {KeyEncryptionAlgorithms}}
+
+     EncryptedData :: = OCTET STRING
+
+
+
+
+
+
+特纳标准跑道[第5页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   EncryptedPrivateKeyInfo中的字段按如下方式使用：
+
+   -encryptionAlgorithm标识了算法，在该算法下
+     私钥信息已加密。
+
+   -加密数据是加密私钥的结果
+     信息（即PrivateKeyInfo）。
+
+   加密过程包括以下两个步骤：
+
+   1.对私钥信息进行编码，生成一个八位位组字符串。
+      生成器应使用DER [ X.690 ]，接收器必须支持BER
+      [ X.690 ]，其中还包括DER [ X.690 ]。
+
+   2.使用密钥对步骤1的结果进行加密，以得到一个
+      八位字节字符串，加密过程的结果。
+
+4。保护非对称密钥包
+
+   CMS保护内容类型[ RFC5652 ]和[ RFC5083 ]可用于
+   为AsymmetricKeyPackage提供安全性：
+
+   -SignedData可用于将数字签名应用于
+     非对称密钥包。
+
+   -EncryptedData可用于对AsymmetricKeyPackage进行加密
+     对称加密，其中发送方和接收方已经
+     共享必要的加密密钥。
+
+   -EnvelopedData可用于加密AsymmetricKeyPackage
+     对称加密，其中发送方和接收方不
+     共享必要的加密密钥。
+
+   -AuthenticatedData可用于保护AsymmetricKeyPackage
+     带有消息验证码，其中密钥管理信息
+     以类似于EnvelopedData的方式处理。
+
+   -AuthEnvelopedData可用于保护AsymmetricKeyPackage
+     使用支持身份验证加密的算法，其中密钥
+     管理信息的处理方式类似于
+     EnvelopedData。
+
+5。其他私钥格式注意事项
+
+   本文档定义了内容类型的语法和语义
+   交换非对称私钥。还有其他两种格式
+   用于传输非对称私钥的密钥：
+
+
+
+
+特纳标准跑道[第6页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   -个人信息交换（PFX）语法标准[ P12 ]，即
+     更通常称为PKCS＃12或简称为P12，是一种转让
+     个人身份信息的语法，包括私钥，
+     证书，其他机密和扩展名。
+     OneAsymmetricKey，PrivateKeyInfo和EncryptedPrivateKeyInfo可以
+     在P12消息中携带。私钥信息，
+     P12 keyBag中带有OneAsymmetricKey和PrivateKeyInfo
+     袋型。P12中携带了EncryptedPrivateKeyInfo
+     pkcs8ShroudedKeyBag BAG-TYPE。在当前的实现中，该文件
+     .pfx和.p12扩展名可以互换使用。
+
+   -Microsoft的私钥专有传输语法。.pvk文件
+     扩展名用于本地存储。
+
+   .pvk和.p12 / .pfx格式不可互换。然而，
+   存在用于将一种格式转换为另一种格式的转换工具。
+
+   要从AsymmetricKeyPackage中提取私钥信息，
+   封装层需要去除。至少，外部
+   ContentInfo [ RFC5652 ]层需要删除。如果
+   将AsymmetricKeyPackage封装在SignedData [ RFC5652 ]中，然后
+   SignedData和EncapsulatedContentInfo层[ RFC5652 ]也需要
+   即将被删除。EnvelopedData，EncryptedData，
+   和来自[ RFC5652 ]以及AuthEnvelopedData的AuthenticatedData
+   来自[ RFC5083 ]。除去所有外层后，
+   许多套私钥信息，例如OneAsymmetricKey
+   结构。OneAsymmetricKey和PrivateKeyInfo相同
+   结构体; 因此，可以将其另存为.p8文件，也可以将其复制到
+   到P12 KeyBag BAG-TYPE。删除封装安全层
+   将使任何签名无效，并可能使密钥暴露给未经授权的人
+   披露。
+
+   .p8文件有时是PEM编码的。.p8文件经过PEM编码时
+   他们使用.pem文件扩展名。PEM编码是Base64
+   来自[RFC4648]第4节的DER编码
+   EncryptedPrivateKeyInfo夹在以下两者之间：
+
+   -----开始加密的私钥-----
+   -----结束加密的私钥-----
+
+   或base64编码，见[RFC4648]的第4节中，DER-的
+   编码的PrivateKeyInfo夹在以下之间：
+
+   -----开始私钥-----
+   -----结束私钥-----
+
+
+
+
+
+
+特纳标准跑道[第7页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+6。安全注意事项
+
+   保护私钥信息对公钥至关重要
+   密码学。私钥资料向另一人披露
+   实体可能导致伪装。加密算法用于
+   加密过程必须与它所保护的密钥一样“强大”。
+
+   非对称密钥包内容不受保护。此内容
+   类型可以与安全协议结合使用以保护内容
+   包装的。
+
+7。IANA注意事项
+
+   本文档利用对象标识符来标识CMS
+   内容类型和附录A中的ASN.1模块。CMS
+   内容类型OID已在DoD弧中注册。ASN.1模块OID为
+   在由RSADSI委派给SMIME工作组的弧中注册。
+   对于本文档或任何其他内容，IANA无需采取进一步措施
+   预期的更新。
+
+   该规范还定义了IANA拥有的新媒体子类型
+   在http://www.iana.org/上注册。
+
+7.1。媒体子类型application / pkcs8的注册
+
+   类型名称：应用程序
+
+   子类型名称：pkcs8
+
+   必填参数：无
+
+   可选参数：无
+
+   编码注意事项：二进制
+
+   安全注意事项：携带加密私钥。
+                            参见第6节。
+
+   互操作性注意事项：
+
+         此媒体类型内的PKCS＃8对象必须进行DER编码
+         PrivateKeyInfo。
+
+   发布的规范：RFC 5958
+
+   使用此媒体类型的应用程序：
+
+     任何处理非对称密钥的MIME兼容传输。
+
+
+
+特纳标准跑道[第8页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   附加信息：
+
+     幻数：无
+     文件扩展名：.p8
+     Macintosh文件类型代码：
+
+   要联系以获取更多信息的人员和电子邮件地址：
+
+     肖恩·特纳（Sean Turner）<turners@ieca.com>
+
+   使用限制：无
+
+   作者：
+
+     肖恩·特纳（Sean Turner）<turners@ieca.com>
+
+   预期用途：COMMON
+
+   变更控制器：
+
+     IESG
+
+8。参考
+
+8.1。规范性引用
+
+   [ RFC2119 ] Bradner，S.，“在RFC中用于指示的关键字
+               要求级别”，BCP 14，RFC 2119，1997年3月。
+
+   [ RFC4648 ] Josefsson，S。，“ Base16，Base32和Base64数据
+               编码”，RFC 4648，2006年10月。
+
+   [ RFC5652 ] R. Housley，“加密消息语法（CMS）”，STD
+               70，RFC 5652（2009年9月）。
+
+   [ RFC5911 ] Hoffman，P.和J. Schaad，“新的ASN.1模块
+               加密消息语法（CMS）和S / MIME”，RFC 5911，
+               2010年6月。
+
+   [ RFC5912 ] Hoffman，P.和J. Schaad，“用于
+               使用X.509（PKIX）的公钥基础结构”，RFC 5912，
+               2010年6月。
+
+   [ X.680 ] ITU-T X.680建议书（2002）| ISO / IEC 8824-1：2002。
+               信息技术-抽象语法表示法之一。
+
+
+
+
+
+
+特纳标准跑道[第9页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   [ X.681 ] ITU-T X.681建议书（2002）| ISO / IEC 8824-2：2002。
+               信息技术-抽象语法表示法一：
+               信息对象规范。
+
+   [ X.682 ] ITU-T X.682建议书（2002）| ISO / IEC 8824-3：2002。
+               信息技术-抽象语法表示法一：
+               约束规范。
+
+   [ X.683 ] ITU-T X.683建议书（2002）| ISO / IEC 8824-4：2002。
+               信息技术-抽象语法表示法一：
+               ASN.1规范的参数化。
+
+   [ X.690 ] ITU-T X.690建议书（2002）| ISO / IEC 8825-1：2002。
+               信息技术-ASN.1编码规则：
+               规范的基本编码规则（BER）
+               编码规则（CER）和杰出的编码规则
+               （DER）。
+
+8.2。信息参考
+
+   [ P12 ] RSA实验室，“ PKCS＃12 v1.0：个人信息
+               交换语法”，1999年6月。
+
+   [ RFC2985 ] Nystrom，M.和B. Kaliski，“ PKCS＃9：选定的对象
+               类和属性类型2.0版，RFC 2985，
+               2000年11月。
+
+   [ RFC3447 ] Jonsson，J。和B. Kaliski，“公共密钥密码术
+               标准（PKCS）＃1：RSA密码规范
+               版本2.1”，RFC 3447，2003年2月。
+
+   [ RFC5083 ] R. Housley，“加密消息语法（CMS）
+               Authenticated-Enveloped-Data Content Type“，RFC 5083，
+               2007年11月。
+
+   [ RFC5208 ] B. Kaliski，“公共密钥密码学标准（PKCS）
+               ＃8：私钥信息语法规范版本
+               1.2“，RFC 5208，2008年5月。
+
+   [ X.520 ] ITU-T X.520建议书（2005）| ISO / IEC 9594-6：2005，
+               信息技术-开放系统互连-
+               目录：选定的属性类型。
+
+   [ RFC5915 ] Turner，S.和D. Brown，“椭圆曲线私钥
+               结构”，RFC 5915，2010年6月。
+
+
+
+
+
+
+特纳标准跑道[第10页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+附录A。ASN.1模块
+
+   本附件提供了针对ASN.1的规范性定义。
+   本规范中使用ASN.1定义的结构
+   [ X.680 ]至[ X.683 ]。
+
+   非对称密钥包模块V1
+     {iso（1）member-body（2）us（840）rsadsi（113549）pkcs（1）pkcs-9（9）
+       smime（16）模块（0）id-mod-asymmetricKeyPkgV1（50）}
+
+   定义隐式标签:: =
+
+   开始
+
+   -全部导出
+
+   进口商品
+
+   -来自新的SMIME ASN.1 [ RFC5911 ]
+
+   属性{}，内容类型
+    来自CryptographicMessageSyntax-2009
+      {iso（1）member-body（2）us（840）rsadsi（113549）pkcs（1）pkcs-9（9）
+        smime（16）模块（0）id-mod-cms-2004-02（41）}
+
+   -来自新的PKIX ASN.1 [ RFC5912 ]
+   属性
+    从PKIX-CommonTypes-2009
+      {iso（1）识别组织（3）dod（6）互联网（1）
+        安全性（5）机制（5）pkix（7）id-mod（0）
+        id-mod-pkixCommon-02（57）}
+
+   -来自新的PKIX ASN.1 [ RFC5912 ]
+
+   AlgorithmIdentifier {}，算法，公共密钥，内容加密
+     FROM AlgorithmInformation-2009
+       {iso（1）识别组织（3）dod（6）互联网（1）
+         安全性（5）机制（5）pkix（7）id-mod（0）
+         id-mod-algorithmInformation-02（58）}
+
+   ;
+
+   ContentSet CONTENT-TYPE :: = {
+    ct-asymmetric-key-package，
+    ...-期望其他内容类型-
+   }
+
+
+
+
+
+特纳标准跑道[第11页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   ct-asymmetric-key-package内容类型:: =
+    {由id-ct-KP-aKeyPackage标识的AsymmetricKeyPackage}
+
+   id-ct-KP-aKeyPackage对象标识符:: =
+     {joint-iso-itu-t（2）国家（16）美国（840）组织（1）
+         gov（101）dod（2）infosec（1）格式（2）
+         密钥包内容类型（78）5
+     }
+
+   AsymmetricKeyPackage :: = OneAsymmetricKey的序列大小（1..MAX）
+
+   OneAsymmetricKey :: = SEQUENCE {
+     版本Version，
+     privateKeyAlgorithm PrivateKeyAlgorithmIdentifier，
+     privateKey私钥，
+     属性[0]属性可选，
+     ...，
+     [[2：publicKey [1] PublicKey OPTIONAL]]，
+     ...
+   }
+
+   PrivateKeyInfo :: = OneAsymmetricKey
+
+   -[ P12 ]使用PrivateKeyInfo 。如果有任何项目标记为版本
+   -使用2，版本必须为v2，否则版本应为
+   -v1。在v1中，PrivateKeyInfo与[ RFC5208 ]中的相同。
+
+   版本:: = INTEGER {v1（0），v2（1）}（v1，...，v2）
+
+   PrivateKeyAlgorithmIdentifier :: = AlgorithmIdentifier
+                                      {公钥，
+                                        {PrivateKeyAlgorithms}}
+
+   私钥:: = OCTET STRING
+                     -内容因按键类型而异。这
+                     -算法标识符规定了格式
+                     -  钥匙。
+
+   公钥:: = BIT STRING
+                     -内容因按键类型而异。这
+                     -算法标识符规定了格式
+                     -  钥匙。
+
+   属性:: = SET OF属性{{OneAsymmetricKeyAttributes}}
+
+   OneAsymmetricKeyAttributes属性:: = {
+     ...-对于本地配置文件
+   }
+
+
+
+特纳标准跑道[第12页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+   -充分利用ASN.1的替代表示形式
+   -约束紧随其后。另请注意，PUBLIC-KEY需要
+   -从新的PKIX ASN.1算法信息模块导入
+   -和PrivateKeyAlgorithms需要注释掉。
+
+   -OneAsymmetricKey :: = SEQUENCE {
+   -版本Version，
+   -privateKeyAlgorithm SEQUENCE {
+   -算法PUBLIC-KEY。＆id（{PublicKeySet}），
+   -参数PUBLIC-KEY。＆Params（{PublicKeySet}
+   -{@ privateKeyAlgorithm.algorithm}）
+   -  可选的}
+   -privateKey OCTET STRING（包含）
+   -PUBLIC-KEY。＆PrivateKey（{PublicKeySet}
+   -{@ privateKeyAlgorithm.algorithm}）），
+   -属性[0]属性可选，
+   -...，
+   -[[2：publicKey [1]位字符串（包含
+   -PUBLIC-KEY。＆Params（{PublicKeySet}
+   -{@ privateKeyAlgorithm.algorithm}）
+   -  可选的，
+   -...
+   -}
+
+   EncryptedPrivateKeyInfo :: = SEQUENCE {
+     encryptionAlgorithm EncryptionAlgorithmIdentifier，
+     加密数据加密数据}
+
+   EncryptionAlgorithmIdentifier :: = AlgorithmIdentifier
+                                       {内容加密，
+                                         {KeyEncryptionAlgorithms}}
+
+   EncryptedData :: = OCTET STRING-加密的PrivateKeyInfo
+
+   PrivateKeyAlgorithms算法::: {
+     ...-可扩展
+   }
+
+   KeyEncryptionAlgorithms算法:: = {
+     ...-可扩展
+   }
+
+   结尾
+
+
+
+
+
+
+
+
+特纳标准跑道[第13页]
+ 
+RFC 5958                 非对称密钥包2010年8月
+
+
+致谢
+
+   非常感谢RSA的Burt Kaliski和Jim Randall。
+   没有文档的先前版本，该文档将不存在。
+
+   我还要感谢Pasi Eronen，Roni Even，Alfred Hoenes，Russ
+   休斯利，吉姆·沙阿德和卡尔·华莱士。
+
+作者地址
+
+   肖恩·特纳（Sean Turner）
+   IECA，Inc.
+   3057 Nutley Street，Suite 106
+   费尔法克斯，VA 22031
+   美国
+
+   电子邮件：turners@ieca.com
