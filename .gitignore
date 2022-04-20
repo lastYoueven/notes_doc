@@ -1,0 +1,9 @@
+*/tast.*
+.idea
+__pycache__
+*/__pycache__
+*/*/__pycache__
+logs/*
+*/logs/*
+*/settings_local.py
+*/*/*/settings_local.py
